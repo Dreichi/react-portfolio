@@ -6,6 +6,7 @@ import Skills from './components/Skills'
 import Certs from './components/Certs';
 import Footer from './components/Footer';
 import ContactForm from './components/ContactForm';
+import Projects from './components/Project';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -20,6 +21,7 @@ function App() {
       <Navbar />
       <Hiro />
       <Skills />
+      <Projects />
       <Certs />
       <ContactForm />
       <Footer />
