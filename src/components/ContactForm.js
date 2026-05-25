@@ -25,46 +25,45 @@ const ContactForm = () => {
       onSubmit={handleSubmit}
       method="POST"
       target="_blank"
+      className="mt-10"
     >
         <div className="justify-center flex mt-4 text-white">
             <h1 className="text-2xl font-bold">Me contacter</h1>
         </div>
-      <div className="mt-6 justify-center flex mb-3 pt-0">
-        <input
-          type="text"
-          placeholder="Votre nom"
-          name="name"
-          className="w-96 h-11 px-3 py-3 placeholder-gray-400 text-gray-600 flex bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
-          required
-        />
-      </div>
-      
-      <div className="justify-center flex mb-3 pt-0">
-        <input
-          type="email"
-          placeholder="Email"
-          name="email"
-          className="w-96 px-3 py-3 placeholder-gray-400 text-gray-600 flex bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
-          required
-        />
-      </div>
-      <div className="justify-center flex mb-3 pt-0">
-        <textarea
-          placeholder="Votre message"
-          name="message"
-          className="w-96 px-3 py-3 placeholder-gray-400 text-gray-600 flex bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
-          required
-        />
-      </div>
-      <div className="justify-center flex mb-3 pt-0">
-        <button
-          className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-          type="submit"
-        >
-         Envoyer un message
-        </button>
+      <div className="terminal-block w-full max-w-2xl mx-auto mt-6 p-6 rounded-lg text-green-200">
+        <p className="font-mono text-sm text-green-400">[contact@louana]$ send --message</p>
+        <div className="mt-4 space-y-4">
+          <input
+            type="text"
+            placeholder="Votre nom"
+            name="name"
+            className="w-full h-11 px-3 py-3 placeholder-gray-400 text-gray-100 bg-black/40 rounded text-sm border border-gray-700 outline-none focus:outline-none focus:ring focus:ring-green-400"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            name="email"
+            className="w-full px-3 py-3 placeholder-gray-400 text-gray-100 bg-black/40 rounded text-sm border border-gray-700 outline-none focus:outline-none focus:ring focus:ring-green-400"
+            required
+          />
+          <textarea
+            placeholder="Votre message"
+            name="message"
+            className="w-full px-3 py-3 placeholder-gray-400 text-gray-100 bg-black/40 rounded text-sm border border-gray-700 outline-none focus:outline-none focus:ring focus:ring-green-400"
+            required
+            rows="5"
+          />
+          <button
+            className="cyber-button font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150"
+            type="submit"
+          >
+           Envoyer un message
+          </button>
+        </div>
       </div>
     </form>
+
   );
 };
 

@@ -32,7 +32,22 @@ export default function Skills() {
     infinite: true,
     slidesToShow: 4,
     slidesToScroll: 1,
+    responsive: [
+      {
+        breakpoint: 1280,
+        settings: { slidesToShow: 3 },
+      },
+      {
+        breakpoint: 1024,
+        settings: { slidesToShow: 2 },
+      },
+      {
+        breakpoint: 640,
+        settings: { slidesToShow: 1 },
+      },
+    ],
   };
+
 
   return (
     <div id="skills" className="mt-4 text-white">
@@ -41,7 +56,7 @@ export default function Skills() {
         Voici quelques unes de mes compétences
       </p>
 
-      <div className="mt-4">
+      <div className="mt-4 terminal-block p-4 rounded-lg">
         <Slider {...settings}>
           <SkillCard name="Linux" experience="7 ans" img={linux} />
           <SkillCard name="Python" experience="5 ans" img={python} />
@@ -67,3 +82,4 @@ export default function Skills() {
     </div>
   );
 }
+

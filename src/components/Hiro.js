@@ -9,8 +9,8 @@ export default function Hiro() {
   const [command, setCommand] = useState("");
   const [showCV, setShowCV] = useState(false);
   const [history, setHistory] = useState([
-    '[damien@portfolio]$ echo "Chargement du profil terminé."',
-    "[system] Bienvenue dans l'environnement shell personnel de Damien.",
+    '[louana@portfolio]$ echo "Chargement du profil terminé."',
+    "[system] Bienvenue dans l'environnement shell personnel de Louana.",
     '[system] Tapez "help" pour découvrir les options disponibles.',
   ]);
 
@@ -33,7 +33,7 @@ export default function Hiro() {
           break;
         case "whoami":
           output =
-            "Damien Jenger (aka louanyaa) – Développeur Fullstack & DevOps";
+            "Louana Jenger (aka louanyaa) – Développeuse Fullstack & DevOps";
           break;
         case "uptime":
           output =
@@ -45,7 +45,7 @@ export default function Hiro() {
           break;
         case "linkedin":
           output =
-            '<a href="https://www.linkedin.com/in/damien-jenger-a46391209/" target="_blank" rel="noopener noreferrer" class="text-blue-400 underline">🔗 linkedin.com/in/damien-jenger</a>';
+            '<a href="https://www.linkedin.com/in/louana-jenger-a46391209/" target="_blank" rel="noopener noreferrer" class="text-blue-400 underline">🔗 linkedin.com/in/louana-jenger</a>';
           break;
         case "cv":
           setShowCV(true);
@@ -81,7 +81,7 @@ export default function Hiro() {
           output = `Commande inconnue : ${cmd}`;
       }
 
-      setHistory((prev) => [...prev, `[damien@portfolio]$ ${command}`, ""]);
+  setHistory((prev) => [...prev, `[louana@portfolio]$ ${command}`, ""]);
 
       const lines = output.split("\n");
       let delay = 0;
@@ -133,7 +133,7 @@ export default function Hiro() {
             src={profile}
             alt="profile"
             onLoad={() => setLoaded(false)}
-            className="rounded-lg shadow-lg"
+            className="rounded-3xl shadow-lg"
           />
         </div>
 
@@ -146,15 +146,15 @@ export default function Hiro() {
           <div className="flex flex-col w-full mt-8">
             <p className="text-md font-mono text-purple-400"> whoami</p>
             <h1 className="text-3xl font-bold text-white">
-              Damien Jenger (aka louanyaa)
+              Louana Jenger (aka louanyaa)
             </h1>
 
             <p className="text-xl font-semibold text-green-400 mt-1">
-              Développeur Fullstack & DevOps
+              Développeuse Fullstack & DevOps
             </p>
 
             <p className="text-md text-gray-300 mt-3">
-              Passionné par les environnements techniques complexes et les défis
+              Passionnée par les environnements techniques complexes et les défis
               concrets, je conçois des outils utiles, durables, et souvent
               sur-mesure. <br />
               En alternance chez{" "}
@@ -180,7 +180,7 @@ export default function Hiro() {
               />
             ))}
             <div className="flex items-center">
-              <span className="text-green-400">[damien@portfolio]$</span>
+              <span className="text-green-400">[louana@portfolio]$</span>
               <input
                 className="bg-transparent outline-none text-white ml-2 w-full"
                 value={command}

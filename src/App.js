@@ -13,7 +13,7 @@ import 'aos/dist/aos.css';
 
 function App() {
     useEffect(() => {
-      document.title = 'Damien Jenger';
+      document.title = 'Louana Jenger';
       AOS.init();
     }, []);
   return (
