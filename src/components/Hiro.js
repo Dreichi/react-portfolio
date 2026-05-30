@@ -123,7 +123,7 @@ export default function Hiro() {
 
       <div
         id="home"
-        className="flex w-full h-screen flex-col md:flex-row gap-5 items-center justify-center text-white relative bg-[#0f0f0f]"
+        className="flex w-full min-h-screen flex-col md:flex-row gap-5 items-center justify-center text-white relative bg-[#0f0f0f]"
       >
         <div className="md:w-3/6 md:p-4">
           <img
