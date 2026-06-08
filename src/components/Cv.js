@@ -187,7 +187,9 @@ function Win({ title, children, style, bodyBg }) {
     <div style={{
       background: bodyBg || C.bgPanel,
       border: `1px solid ${C.border}`,
-      borderRadius: 8, overflow: "hidden", ...style,
+      borderRadius: 8, overflow: "hidden",
+      display: "flex", flexDirection: "column",
+      ...style,
     }}>
       <WinBar title={title} />
       {children}
@@ -221,26 +223,28 @@ function Prompt({ children }) {
 function TerminalPanel({ topic, host, entries, style }) {
   return (
     <Win bodyBg={C.bgTerm} style={style} title={<PromptTitle topic={topic} host={host} />}>
-      <div style={{ padding: "13px 15px", ...mono, fontSize: 9, lineHeight: 1.6 }}>
-        {entries.map((exp, i) => (
-          <div key={i} style={{ marginBottom: 16 }}>
-            <div style={{ marginBottom: 4 }}>
-              <Prompt>
-                <span style={{ color: C.white }}>cat </span>
-                <span style={{ color: C.blue }}>{exp.file}</span>
-              </Prompt>
-            </div>
-            <div style={{ color: C.white, fontWeight: 700, fontSize: 10 }}>{exp.role}</div>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
-              <span style={{ color: C.blue, fontWeight: 600 }}>🏢 {exp.company}</span>
-              <span style={{ color: C.green, fontWeight: 600, flexShrink: 0 }}>{exp.date}</span>
-            </div>
-            {exp.lines.map((line, j) => (
-              <div key={j} style={{ color: C.body }}>{line}</div>
-            ))}
-          </div>
-        ))}
+      <div style={{ flex: 1, padding: "13px 15px", ...mono, fontSize: 9, lineHeight: 1.6, display: "flex", flexDirection: "column" }}>
         <div>
+          {entries.map((exp, i) => (
+            <div key={i} style={{ marginBottom: 16 }}>
+              <div style={{ marginBottom: 4 }}>
+                <Prompt>
+                  <span style={{ color: C.white }}>cat </span>
+                  <span style={{ color: C.blue }}>{exp.file}</span>
+                </Prompt>
+              </div>
+              <div style={{ color: C.white, fontWeight: 700, fontSize: 10 }}>{exp.role}</div>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+                <span style={{ color: C.blue, fontWeight: 600 }}>🏢 {exp.company}</span>
+                <span style={{ color: C.green, fontWeight: 600, flexShrink: 0 }}>{exp.date}</span>
+              </div>
+              {exp.lines.map((line, j) => (
+                <div key={j} style={{ color: C.body }}>{line}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: "auto" }}>
           <Prompt>
             <span style={{ color: C.green }}>▊</span>
           </Prompt>
@@ -397,8 +401,7 @@ export default function Cv() {
       imgW = pageH / r;
     }
     const x = (pageW - imgW) / 2;
-    const y = (pageH - imgH) / 2;
-    pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, imgW, imgH);
+    pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, 0, imgW, imgH);
     pdf.save("CV_Louana_Jenger.pdf");
   }, []);
 
@@ -432,7 +435,8 @@ export default function Cv() {
       </div>
 
       <div ref={scrollRef} style={{
-        flex: 1, overflow: "auto", padding: "32px 24px",
+        flex: 1, overflow: "auto", padding: "16px 24px",
+        background: C.bgDark,
         WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y",
         overscrollBehavior: "contain",
       }}>
