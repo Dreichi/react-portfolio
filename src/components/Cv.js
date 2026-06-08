@@ -151,8 +151,8 @@ function WinBar({ title }) {
       background: C.bgHeader, padding: "7px 14px",
       borderBottom: `1px solid ${C.border}`, gap: 8,
     }}>
-      <span style={{ ...mono, fontSize: 11, color: C.dim }}>🔍</span>
-      <span style={{ flex: 1, textAlign: "center", ...mono, fontSize: 11 }}>{title}</span>
+      <span style={{ ...mono, fontSize: 11, color: C.dim, lineHeight: 1 }}>🔍</span>
+      <span style={{ flex: 1, textAlign: "center", ...mono, fontSize: 11, lineHeight: 1 }}>{title}</span>
       <WinDots />
     </div>
   );
@@ -355,19 +355,10 @@ export default function Cv() {
       if (zl) zl.style.zoom = prevZoom;
     }
 
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-
-    const r = canvas.height / canvas.width;
-    let imgW = pageW;
-    let imgH = pageW * r;
-    if (imgH > pageH) {
-      imgH = pageH;
-      imgW = pageH / r;
-    }
-    const x = (pageW - imgW) / 2;
-    pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, 0, imgW, imgH);
+    const pageW = 210;
+    const pageH = +(pageW * canvas.height / canvas.width).toFixed(1);
+    const pdf = new jsPDF({ orientation: "p", unit: "mm", format: [pageW, pageH] });
+    pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pageW, pageH);
     pdf.save("CV_Louana_Jenger.pdf");
   }, []);
 
@@ -648,7 +639,7 @@ export default function Cv() {
                 display: "flex", alignItems: "center", background: C.bgHeader,
                 borderBottom: `1px solid ${C.border}`, padding: "6px 14px", gap: 10,
               }}>
-                <span style={{ ...mono, fontSize: 11, color: C.white, fontWeight: 600 }}>Files</span>
+                <span style={{ ...mono, fontSize: 11, color: C.white, fontWeight: 600, lineHeight: 1 }}>Files</span>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
                   <span style={{ color: C.dim, fontSize: 13 }}>‹</span>
                   <span style={{ color: C.dim, fontSize: 13 }}>›</span>
