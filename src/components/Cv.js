@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useLayoutEffect, useCallback, Fragment } from "react";
-import html2canvas from "html2canvas";
+import { toCanvas } from "html-to-image";
 import { jsPDF } from "jspdf";
 import portrait from "../assets/cv-portrait.png";
 import qr from "../assets/cv-qr.png";
@@ -151,8 +151,8 @@ function WinBar({ title }) {
       background: C.bgHeader, padding: "0 14px", height: 30,
       borderBottom: `1px solid ${C.border}`, gap: 8,
     }}>
-      <span style={{ ...mono, fontSize: 11, color: C.dim, lineHeight: "30px" }}>🔍</span>
-      <span style={{ flex: 1, textAlign: "center", ...mono, fontSize: 11, lineHeight: "30px" }}>{title}</span>
+      <span style={{ ...mono, fontSize: 11, color: C.dim }}>🔍</span>
+      <span style={{ flex: 1, textAlign: "center", ...mono, fontSize: 11 }}>{title}</span>
       <WinDots />
     </div>
   );
@@ -348,15 +348,8 @@ export default function Cv() {
     if (zl) zl.style.zoom = "1";
     let canvas;
     try {
-      canvas = await html2canvas(cvRef.current, {
-        scale: 2, backgroundColor: C.bgDark, logging: false, useCORS: true,
-        onclone: (doc) => {
-          doc.querySelectorAll("span").forEach((sp) => {
-            if ((sp.style && sp.style.lineHeight === "30px") || sp.hasAttribute("data-pdfc")) {
-              sp.style.transform = "translateY(-8.6px)";
-            }
-          });
-        },
+      canvas = await toCanvas(cvRef.current, {
+        pixelRatio: 3, backgroundColor: C.bgDark, cacheBust: true,
       });
     } finally {
       if (zl) zl.style.zoom = prevZoom;
@@ -646,12 +639,12 @@ export default function Cv() {
                 display: "flex", alignItems: "center", background: C.bgHeader,
                 borderBottom: `1px solid ${C.border}`, padding: "0 14px", height: 30, gap: 10,
               }}>
-                <span style={{ ...mono, fontSize: 11, color: C.white, fontWeight: 600, lineHeight: "30px" }}>Files</span>
+                <span style={{ ...mono, fontSize: 11, color: C.white, fontWeight: 600 }}>Files</span>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
-                  <span style={{ color: C.dim, fontSize: 13, lineHeight: "30px" }}>‹</span>
-                  <span style={{ color: C.dim, fontSize: 13, lineHeight: "30px" }}>›</span>
+                  <span style={{ color: C.dim, fontSize: 13 }}>‹</span>
+                  <span style={{ color: C.dim, fontSize: 13 }}>›</span>
                   <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 4, padding: "2px 8px" }}>
-                    <span data-pdfc="" style={{ ...mono, fontSize: 9.5, color: C.body }}>📁 Formation</span>
+                    <span style={{ ...mono, fontSize: 9.5, color: C.body }}>📁 Formation</span>
                   </div>
                 </div>
                 <WinDots />
