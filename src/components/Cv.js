@@ -148,11 +148,11 @@ function WinBar({ title }) {
   return (
     <div style={{
       display: "flex", alignItems: "center",
-      background: C.bgHeader, padding: "7px 14px",
+      background: C.bgHeader, padding: "0 14px", height: 30,
       borderBottom: `1px solid ${C.border}`, gap: 8,
     }}>
-      <span style={{ ...mono, fontSize: 11, color: C.dim, lineHeight: 1 }}>🔍</span>
-      <span style={{ flex: 1, textAlign: "center", ...mono, fontSize: 11, lineHeight: 1 }}>{title}</span>
+      <span style={{ ...mono, fontSize: 11, color: C.dim, lineHeight: "30px" }}>🔍</span>
+      <span style={{ flex: 1, textAlign: "center", ...mono, fontSize: 11, lineHeight: "30px" }}>{title}</span>
       <WinDots />
     </div>
   );
@@ -350,6 +350,13 @@ export default function Cv() {
     try {
       canvas = await html2canvas(cvRef.current, {
         scale: 2, backgroundColor: C.bgDark, logging: false, useCORS: true,
+        onclone: (doc) => {
+          doc.querySelectorAll("span").forEach((sp) => {
+            if ((sp.style && sp.style.lineHeight === "30px") || sp.hasAttribute("data-pdfc")) {
+              sp.style.transform = "translateY(-8.6px)";
+            }
+          });
+        },
       });
     } finally {
       if (zl) zl.style.zoom = prevZoom;
@@ -637,14 +644,14 @@ export default function Cv() {
             <div style={{ flex: 1, background: C.bgPanel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden" }}>
               <div style={{
                 display: "flex", alignItems: "center", background: C.bgHeader,
-                borderBottom: `1px solid ${C.border}`, padding: "6px 14px", gap: 10,
+                borderBottom: `1px solid ${C.border}`, padding: "0 14px", height: 30, gap: 10,
               }}>
-                <span style={{ ...mono, fontSize: 11, color: C.white, fontWeight: 600, lineHeight: 1 }}>Files</span>
+                <span style={{ ...mono, fontSize: 11, color: C.white, fontWeight: 600, lineHeight: "30px" }}>Files</span>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
-                  <span style={{ color: C.dim, fontSize: 13 }}>‹</span>
-                  <span style={{ color: C.dim, fontSize: 13 }}>›</span>
+                  <span style={{ color: C.dim, fontSize: 13, lineHeight: "30px" }}>‹</span>
+                  <span style={{ color: C.dim, fontSize: 13, lineHeight: "30px" }}>›</span>
                   <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 4, padding: "2px 8px" }}>
-                    <span style={{ ...mono, fontSize: 9.5, color: C.body }}>📁 Formation</span>
+                    <span data-pdfc="" style={{ ...mono, fontSize: 9.5, color: C.body }}>📁 Formation</span>
                   </div>
                 </div>
                 <WinDots />
