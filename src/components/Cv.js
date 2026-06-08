@@ -680,7 +680,8 @@ export default function Cv() {
 
                 <div style={{
                   flex: 1, padding: "14px 18px",
-                  display: "flex", flexWrap: "wrap", gap: "14px 22px", alignItems: "flex-start",
+                  display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
+                  gap: "16px 8px", justifyItems: "center", alignItems: "start",
                 }}>
                   {formationFolders.map((f) => <Folder key={f.years} years={f.years} label={f.label} />)}
                 </div>
