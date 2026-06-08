@@ -26,6 +26,139 @@ const C = {
 const mono = { fontFamily: "'Fira Code', 'Source Code Pro', monospace" };
 const sans = { fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" };
 
+const identity = {
+  name: "Louana Jenger",
+  title: "Data / AI Engineer · Fullstack & DevOps",
+};
+
+const contact = [
+  ["Localisation", "Lens, France",                      C.text],
+  ["Email",        "louana.jenger@gmail.com",           C.text],
+  ["Téléphone",    "07 81 16 27 23",                    C.text],
+  ["Portfolio",    "dreichi.github.io/react-portfolio", C.blue],
+  ["Permis",       "B (en cours)",                      C.text],
+];
+
+const stack = [
+  "Python, FastAPI, SQL (PostgreSQL, MariaDB)",
+  "Qdrant, Ollama, RAG, embeddings, LoRA/QLoRA",
+  "Docker, Linux, Git, systemd, AWS",
+  "React, Node.js, TypeScript (web)",
+];
+
+const langues = [
+  ["Français", "Natif"],
+  ["Anglais", "B1 (intermédiaire)"],
+];
+
+const objectif = "Alternance Data / AI Engineer";
+const profil = "Curieuse · Résiliente · Axée solutions";
+
+const bioText = [
+  "Développeuse orientée Data & IA, j'aime résoudre des problèmes complexes en prenant le temps d'en considérer les différents aspects — technique, métier et usage. Je cherche à construire des choses fiables, qui ont du sens et une utilité concrète.",
+  "Je recherche une alternance de Data / AI Engineer dans un environnement stimulant, où je peux apprendre vite tout en apportant de la valeur. Curieuse, rigoureuse et à l'écoute.",
+];
+
+const projets = [
+  {
+    file: "~/projects/erp-rag/README.md",
+    date: "Début 2026",
+    role: "💼 Projet personnel – Data / AI Engineer",
+    company: "ERP Script Finder (RAG local + LLM fine-tuné)",
+    lines: [
+      "🔎 Recherche en langage naturel sur 23 094 scripts ERP (Delphi/WinDev), 100% local",
+      "🧬 Qdrant · recherche hybride BM25 + dense · HyDE · reranking Jina v2",
+      "🎯 Fine-tuning Qwen3.5-35B quantifié (LoRA/QLoRA, Unsloth) · 33k exemples · GPU RunPod",
+      "🚀 API FastAPI en production (systemd) · 89/100 aux tests · ~7 ms/requête",
+    ],
+  },
+  {
+    file: "~/Downloads/DAYREAD/fansub.txt",
+    date: "2021 – 2023",
+    role: "💼 Projet personnel – Équipe de fansub",
+    company: "DAYREAD",
+    lines: [
+      "🗂 Site WordPress hébergeant des épisodes traduits",
+      "💬 Sous-titrage anglais → français (traduction & adaptation)",
+      "🌍 Contenu multilingue, SEO, maintenance technique",
+      "🤝 Coordination d'équipe & publication régulière",
+    ],
+  },
+];
+
+const experiencesPro = [
+  {
+    file: "~/snap/IciLaProd/experience.txt",
+    date: "Octobre 2023 – Avril 2025",
+    role: "💼 Alternance – Développeur DevOps & Fullstack",
+    company: "Ici La Prod SAS",
+    lines: [
+      "🧠 CRM sur mesure centralisant les données de l'équipe commerciale (~5 users)",
+      "🔁 Itérations rapides avec retours directs des utilisateurs pour corriger & améliorer",
+      "🛠 Automatisations internes pour fluidifier le travail des équipes",
+      "🗓 Dév. d'Azenda (planification de RDV) · React, NodeJS, PostgreSQL, Docker",
+    ],
+  },
+  {
+    file: "~/snap/TalesAndKeys/devlog.txt",
+    date: "Mars 2023 – Juin 2023",
+    role: "💼 Stage – Développeur Web",
+    company: "TalesAndKeys",
+    lines: [
+      "🛠 App mobile-first en ReactJS",
+      "🔗 API NodeJS avec MongoDB",
+      "🧩 Toutes les étapes : front/back, tests, intégration",
+    ],
+  },
+];
+
+const diplomas = [
+  { perms: "-rw-r--r--", year: "2024", icon: "📘", name: "Licence Concepteur & Dév. d'Applications", school: "EPSI Arras" },
+  { perms: "-rw-r--r--", year: "2023", icon: "💻", name: "Certification Développeur Web",             school: "Pop'School" },
+  { perms: "-rw-r--r--", year: "2020", icon: "🔬", name: "BAC Sciences et Techniques de Labo.",       school: "Grenoble" },
+];
+
+const formationFolders = [
+  { years: "2026...", label: "" },
+  { years: "2023\n-\n2025", label: "EPSI Arras - Licence DevOPS" },
+  { years: "2022\n-\n2023", label: "Popschool - Dév. Web/mobile" },
+  { years: "2021\n-\n2022", label: "IUT Lens - BUT informatique" },
+  { years: "2018\n-\n2020", label: "BAC STL - Sciences Labo." },
+];
+
+const SHEET_W = 794;
+
+function buildAtsLines() {
+  const L = [];
+  L.push(identity.name);
+  L.push(identity.title);
+  contact.forEach(([k, v]) => L.push(`${k} : ${v}`));
+  bioText.forEach((p) => L.push(p));
+  L.push("Stack : " + stack.join(" ; "));
+  L.push("Langues : " + langues.map(([k, v]) => `${k} ${v}`).join(", "));
+  L.push("Objectif : " + objectif);
+  L.push("Projets personnels :");
+  projets.forEach((p) => {
+    L.push(`${p.role} - ${p.company} (${p.date})`);
+    p.lines.forEach((x) => L.push(x));
+  });
+  L.push("Experience professionnelle :");
+  experiencesPro.forEach((p) => {
+    L.push(`${p.role} - ${p.company} (${p.date})`);
+    p.lines.forEach((x) => L.push(x));
+  });
+  L.push("Diplomes :");
+  diplomas.forEach((d) => L.push(`${d.year} - ${d.name} (${d.school})`));
+  return L;
+}
+
+const asciiPdf = (s) => s
+  .replace(/→/g, "->")
+  .replace(/[–—]/g, "-")
+  .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}️‍]/gu, "")
+  .replace(/\s+/g, " ")
+  .trim();
+
 function WinDots() {
   return (
     <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
@@ -144,61 +277,6 @@ function Folder({ years, label }) {
   );
 }
 
-const projets = [
-  {
-    file: "~/projects/erp-rag/README.md",
-    date: "Début 2026",
-    role: "💼 Projet personnel – Data / AI Engineer",
-    company: "ERP Script Finder (RAG local + LLM fine-tuné)",
-    lines: [
-      "🔎 Recherche en langage naturel sur 23 094 scripts ERP (Delphi/WinDev), 100% local",
-      "🧬 Qdrant · recherche hybride BM25 + dense · HyDE · reranking Jina v2",
-      "🎯 Fine-tuning Qwen3.5-35B quantifié (LoRA/QLoRA, Unsloth) · 33k exemples · GPU RunPod",
-      "🚀 API FastAPI en production (systemd) · 89/100 aux tests · ~7 ms/requête",
-    ],
-  },
-  {
-    file: "~/Downloads/DAYREAD/fansub.txt",
-    date: "2021 – 2023",
-    role: "💼 Projet personnel – Équipe de fansub",
-    company: "DAYREAD",
-    lines: [
-      "🗂 Site WordPress hébergeant des épisodes traduits",
-      "💬 Sous-titrage anglais → français (traduction & adaptation)",
-      "🌍 Contenu multilingue, SEO, maintenance technique",
-      "🤝 Coordination d'équipe & publication régulière",
-    ],
-  },
-];
-
-const experiencesPro = [
-  {
-    file: "~/snap/IciLaProd/experience.txt",
-    date: "Octobre 2023 – Avril 2025",
-    role: "💼 Alternance – Développeur DevOps & Fullstack",
-    company: "Ici La Prod SAS",
-    lines: [
-      "🧠 Création d'un CRM sur mesure pour les commerciaux",
-      "🛠 Automatisations via scripts internes pour les équipes",
-      "🗓 Dév. d'Azenda — plateforme de planification de RDV",
-      "🌐 Stack : React, NodeJS, PostgreSQL, Docker",
-    ],
-  },
-  {
-    file: "~/snap/TalesAndKeys/devlog.txt",
-    date: "Mars 2023 – Juin 2023",
-    role: "💼 Stage – Développeur Web",
-    company: "TalesAndKeys",
-    lines: [
-      "🛠 App mobile-first en ReactJS",
-      "🔗 API NodeJS avec MongoDB",
-      "🧩 Toutes les étapes : front/back, tests, intégration",
-    ],
-  },
-];
-
-const SHEET_W = 794;
-
 export default function Cv() {
   const cvRef = useRef(null);
   const scrollRef = useRef(null);
@@ -295,23 +373,32 @@ export default function Cv() {
     } finally {
       if (zl) zl.style.zoom = prevZoom;
     }
+
     const pdf = new jsPDF("p", "mm", "a4");
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
-    const imgW = pageW;
-    const imgH = (canvas.height * imgW) / canvas.width;
-    const imgData = canvas.toDataURL("image/png");
 
-    let heightLeft = imgH;
-    let position = 0;
-    pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
-    heightLeft -= pageH;
-    while (heightLeft > 0) {
-      position -= pageH;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
-      heightLeft -= pageH;
+    pdf.setFillColor(20, 20, 20);
+    pdf.rect(0, 0, pageW, pageH, "F");
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6);
+    pdf.setTextColor(20, 20, 20);
+    buildAtsLines().forEach((ln, i) => {
+      const t = asciiPdf(ln);
+      if (t) pdf.text(t, 6, 9 + i * 3.1, { maxWidth: pageW - 12 });
+    });
+
+    const r = canvas.height / canvas.width;
+    let imgW = pageW;
+    let imgH = pageW * r;
+    if (imgH > pageH) {
+      imgH = pageH;
+      imgW = pageH / r;
     }
+    const x = (pageW - imgW) / 2;
+    const y = (pageH - imgH) / 2;
+    pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, imgW, imgH);
     pdf.save("CV_Louana_Jenger.pdf");
   }, []);
 
@@ -351,32 +438,26 @@ export default function Cv() {
       }}>
         <div ref={zoomLayerRef} style={{ width: SHEET_W, margin: "0 auto", zoom }}>
           <div ref={cvRef} style={{
-            display: "flex", flexDirection: "column", gap: 8,
-            background: C.bgDark, padding: 8, borderRadius: 12,
+            display: "flex", flexDirection: "column", gap: 7,
+            background: C.bgDark, padding: 7, borderRadius: 12,
           }}>
 
-          <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+          <div style={{ display: "flex", gap: 7, alignItems: "stretch" }}>
 
             <Win style={{ flex: 7 }} title={<PromptTitle topic="Informations" host="LouPC" />}>
-              <div style={{ padding: "14px 18px" }}>
-                <div style={{ display: "flex", gap: 16, marginBottom: 14, alignItems: "flex-start" }}>
+              <div style={{ padding: "12px 16px" }}>
+                <div style={{ display: "flex", gap: 16, marginBottom: 12, alignItems: "flex-start" }}>
                   <img src={portrait} alt="Louana Jenger"
-                    style={{ width: 90, flexShrink: 0, display: "block", borderRadius: 4 }} />
+                    style={{ width: 86, flexShrink: 0, display: "block", borderRadius: 4 }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ ...sans, fontSize: 18, fontWeight: 700, color: C.white, lineHeight: 1.1, marginBottom: 3 }}>
-                      Louana Jenger
+                      {identity.name}
                     </div>
-                    <div style={{ ...mono, fontSize: 9.5, color: C.blue, marginBottom: 10 }}>
+                    <div style={{ ...mono, fontSize: 9.5, color: C.blue, marginBottom: 9 }}>
                       Data / AI Engineer · Fullstack &amp; DevOps
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                      {[
-                        ["Localisation", "Lens, France",                      C.text],
-                        ["Email",        "louana.jenger@gmail.com",           C.text],
-                        ["Téléphone",    "07 81 16 27 23",                    C.text],
-                        ["Portfolio",    "dreichi.github.io/react-portfolio", C.blue],
-                        ["Permis",       "B (en cours)",                      C.text],
-                      ].map(([lbl, val, col]) => (
+                      {contact.map(([lbl, val, col]) => (
                         <div key={lbl} style={{ ...mono, fontSize: 9, display: "flex", gap: 8 }}>
                           <span style={{ color: C.yellow, minWidth: 72, flexShrink: 0 }}>{lbl}</span>
                           <span style={{ color: col }}>{val}</span>
@@ -388,32 +469,34 @@ export default function Cv() {
                     style={{ width: 54, flexShrink: 0, background: "#fff", padding: 2, borderRadius: 2 }} />
                 </div>
 
-                <div style={{ marginBottom: 8 }}>
+                <div style={{ marginBottom: 7 }}>
                   <div style={{ ...mono, fontSize: 9.5, color: C.yellow, marginBottom: 4 }}>🧠 Stack</div>
                   <div style={{ ...mono, fontSize: 9, color: C.body, lineHeight: 1.7 }}>
-                    - Python, FastAPI, SQL (PostgreSQL, MariaDB)<br />
-                    - Qdrant, Ollama, RAG, embeddings, LoRA/QLoRA<br />
-                    - Docker, Linux, Git, systemd, AWS<br />
-                    - React, Node.js, TypeScript (web)
+                    {stack.map((s) => (
+                      <Fragment key={s}>- {s}<br /></Fragment>
+                    ))}
                   </div>
                 </div>
 
-                <div style={{ marginBottom: 8 }}>
+                <div style={{ marginBottom: 7 }}>
                   <div style={{ ...mono, fontSize: 9.5, color: C.yellow, marginBottom: 4 }}>🗣 Langues</div>
                   <div style={{ ...mono, fontSize: 9, color: C.body }}>
-                    Français : <span style={{ color: C.white }}>Natif</span>
-                    {"   "}Anglais : <span style={{ color: C.white }}>B1 (intermédiaire)</span>
+                    {langues.map(([k, v], i) => (
+                      <Fragment key={k}>
+                        {i > 0 ? "   " : ""}{k} : <span style={{ color: C.white }}>{v}</span>
+                      </Fragment>
+                    ))}
                   </div>
                 </div>
 
                 <div style={{ ...mono, fontSize: 9, display: "flex", gap: 20, flexWrap: "wrap" }}>
                   <span>
                     <span style={{ color: C.yellow }}>🎯 Objectif </span>
-                    <span style={{ color: C.white, fontWeight: 600 }}>Alternance Data / AI Engineer</span>
+                    <span style={{ color: C.white, fontWeight: 600 }}>{objectif}</span>
                   </span>
                   <span>
                     <span style={{ color: C.yellow }}>🌸 Profil </span>
-                    <span style={{ color: C.body }}>Curieuse · Résiliente · Axée solutions</span>
+                    <span style={{ color: C.body }}>{profil}</span>
                   </span>
                 </div>
               </div>
@@ -432,7 +515,7 @@ export default function Cv() {
                 <span style={{ color: C.white }}>New Buffer</span>
                 <span>Modified</span>
               </div>
-              <div style={{ flex: 1, padding: "12px", ...sans, fontSize: 10, color: C.body, lineHeight: 1.75 }}>
+              <div style={{ flex: 1, padding: "12px", ...sans, fontSize: 10, color: C.body, lineHeight: 1.7 }}>
                 <p style={{ margin: "0 0 10px 0" }}>
                   Développeuse orientée <strong style={{ color: C.text }}>Data &amp; IA</strong>,
                   j'aime résoudre des problèmes complexes en prenant le temps d'en considérer
@@ -455,15 +538,15 @@ export default function Cv() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+          <div style={{ display: "flex", gap: 7, alignItems: "stretch" }}>
             <TerminalPanel topic="Projets" host="perso" entries={projets} style={{ flex: 1 }} />
             <TerminalPanel topic="Expérience" host="pro" entries={experiencesPro} style={{ flex: 1 }} />
           </div>
 
-          <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+          <div style={{ display: "flex", gap: 7, alignItems: "stretch" }}>
 
             <Win style={{ width: "36%", flexShrink: 0 }} title={<span style={{ ...mono, fontSize: 11, color: C.text }}>Diplômes</span>}>
-              <div style={{ padding: "12px 14px", ...mono, fontSize: 9 }}>
+              <div style={{ padding: "11px 14px", ...mono, fontSize: 9 }}>
                 <div style={{ marginBottom: 5 }}>
                   <span style={{ color: C.green }}>louana@portfolio</span>
                   <span style={{ color: C.body }}>:</span>
@@ -476,13 +559,9 @@ export default function Cv() {
                 <div style={{
                   display: "grid",
                   gridTemplateColumns: "max-content max-content 1fr",
-                  columnGap: 10, rowGap: 10, alignItems: "start",
+                  columnGap: 10, rowGap: 9, alignItems: "start",
                 }}>
-                  {[
-                    { perms: "-rw-r--r--", year: "2024", icon: "📘", name: "Licence Concepteur & Dév. d'Applications", school: "EPSI Arras" },
-                    { perms: "-rw-r--r--", year: "2023", icon: "💻", name: "Certification Développeur Web",             school: "Pop'School" },
-                    { perms: "-rw-r--r--", year: "2020", icon: "🔬", name: "BAC Sciences et Techniques de Labo.",       school: "Grenoble" },
-                  ].map((d) => (
+                  {diplomas.map((d) => (
                     <Fragment key={d.year}>
                       <span style={{ color: C.dim }}>{d.perms}</span>
                       <span style={{ color: C.text }}>{d.year}</span>
@@ -534,16 +613,10 @@ export default function Cv() {
                 </div>
 
                 <div style={{
-                  flex: 1, padding: "16px 18px",
-                  display: "flex", flexWrap: "wrap", gap: "16px 22px", alignItems: "flex-start",
+                  flex: 1, padding: "14px 18px",
+                  display: "flex", flexWrap: "wrap", gap: "14px 22px", alignItems: "flex-start",
                 }}>
-                  {[
-                    { years: "2026...", label: "" },
-                    { years: "2023\n-\n2025", label: "EPSI Arras - Licence DevOPS" },
-                    { years: "2022\n-\n2023", label: "Popschool - Dév. Web/mobile" },
-                    { years: "2021\n-\n2022", label: "IUT Lens - BUT informatique" },
-                    { years: "2018\n-\n2020", label: "BAC STL - Sciences Labo." },
-                  ].map((f) => <Folder key={f.years} years={f.years} label={f.label} />)}
+                  {formationFolders.map((f) => <Folder key={f.years} years={f.years} label={f.label} />)}
                 </div>
               </div>
             </div>
