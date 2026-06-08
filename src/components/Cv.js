@@ -382,17 +382,6 @@ export default function Cv() {
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
 
-    pdf.setFillColor(20, 20, 20);
-    pdf.rect(0, 0, pageW, pageH, "F");
-
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(6);
-    pdf.setTextColor(20, 20, 20);
-    buildAtsLines().forEach((ln, i) => {
-      const t = asciiPdf(ln);
-      if (t) pdf.text(t, 6, 9 + i * 3.1, { maxWidth: pageW - 12 });
-    });
-
     const r = canvas.height / canvas.width;
     let imgW = pageW;
     let imgH = pageW * r;
@@ -402,7 +391,84 @@ export default function Cv() {
     }
     const x = (pageW - imgW) / 2;
     pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, 0, imgW, imgH);
-    pdf.save("CV_Louana_Jenger.pdf");
+    pdf.save("CV_Louana_Jenger_Design.pdf");
+  }, []);
+
+  const exportPDFAts = useCallback(() => {
+    const pdf = new jsPDF("p", "mm", "a4");
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(11);
+    pdf.setTextColor(0, 0, 0);
+
+    let y = 15;
+    const lineH = 5.5;
+    const pageH = pdf.internal.pageSize.getHeight();
+    const pageW = pdf.internal.pageSize.getWidth();
+    const margin = 15;
+    const maxW = pageW - margin * 2;
+
+    const addLine = (text) => {
+      if (y > pageH - 15) {
+        pdf.addPage();
+        y = 15;
+      }
+      if (text.trim()) {
+        pdf.text(asciiPdf(text), margin, y, { maxWidth: maxW });
+        y += lineH;
+      } else {
+        y += 2;
+      }
+    };
+
+    addLine(identity.name);
+    pdf.setFontSize(10);
+    addLine(identity.title);
+    pdf.setFontSize(11);
+    addLine("");
+
+    contact.forEach(([k, v]) => addLine(`${k}: ${v}`));
+    addLine("");
+
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "bold");
+    addLine("Profil");
+    pdf.setFont("helvetica", "normal");
+    bioText.forEach((p) => addLine(asciiPdf(p)));
+    addLine("");
+
+    pdf.setFont("helvetica", "bold");
+    addLine("Compétences");
+    pdf.setFont("helvetica", "normal");
+    addLine("Stack: " + stack.join(" · "));
+    addLine("Langues: " + langues.map(([k, v]) => `${k} (${v})`).join(" · "));
+    addLine("");
+
+    pdf.setFont("helvetica", "bold");
+    addLine("Projets Personnels");
+    pdf.setFont("helvetica", "normal");
+    projets.forEach((p) => {
+      addLine(`${p.role} – ${p.company} (${p.date})`);
+      p.lines.forEach((ln) => addLine(asciiPdf(ln)));
+      addLine("");
+    });
+
+    pdf.setFont("helvetica", "bold");
+    addLine("Expérience Professionnelle");
+    pdf.setFont("helvetica", "normal");
+    experiencesPro.forEach((p) => {
+      addLine(`${p.role} – ${p.company} (${p.date})`);
+      p.lines.forEach((ln) => addLine(asciiPdf(ln)));
+      addLine("");
+    });
+
+    pdf.setFont("helvetica", "bold");
+    addLine("Diplômes");
+    pdf.setFont("helvetica", "normal");
+    diplomas.forEach((d) => {
+      addLine(`${d.year} – ${d.name} (${d.school})`);
+    });
+
+    pdf.save("CV_Louana_Jenger_ATS.pdf");
   }, []);
 
   const zbtn = {
@@ -430,7 +496,11 @@ export default function Cv() {
         </div>
         <button onClick={exportPDF} className="cyber-button"
           style={{ borderRadius: 9999, padding: "6px 18px", fontSize: 12, cursor: "pointer" }}>
-          ⬇ Télécharger le PDF
+          ⬇ PDF Design
+        </button>
+        <button onClick={exportPDFAts} className="cyber-button"
+          style={{ borderRadius: 9999, padding: "6px 18px", fontSize: 12, cursor: "pointer" }}>
+          ⬇ PDF Texte (ATS)
         </button>
       </div>
 
