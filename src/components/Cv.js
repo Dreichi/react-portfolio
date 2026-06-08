@@ -375,6 +375,7 @@ export default function Cv() {
                         ["Email",        "louana.jenger@gmail.com",           C.text],
                         ["Téléphone",    "07 81 16 27 23",                    C.text],
                         ["Portfolio",    "dreichi.github.io/react-portfolio", C.blue],
+                        ["Permis",       "B (en cours)",                      C.text],
                       ].map(([lbl, val, col]) => (
                         <div key={lbl} style={{ ...mono, fontSize: 9, display: "flex", gap: 8 }}>
                           <span style={{ color: C.yellow, minWidth: 72, flexShrink: 0 }}>{lbl}</span>
