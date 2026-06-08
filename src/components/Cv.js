@@ -263,6 +263,7 @@ export default function Cv() {
   const zoomLayerRef = useRef(null);
   const [zoom, setZoom] = useState(1);
   const [navH, setNavH] = useState(64);
+  const [dlOpen, setDlOpen] = useState(false);
 
   const zoomIn = () => setZoom((z) => Math.min(2, +(z + 0.1).toFixed(2)));
   const zoomOut = () => setZoom((z) => Math.max(0.4, +(z - 0.1).toFixed(2)));
@@ -470,14 +471,39 @@ export default function Cv() {
           <button onClick={zoomIn} className="cyber-button" style={zbtn} aria-label="Zoomer">+</button>
           <button onClick={fitWidth} className="cyber-button" style={{ ...zbtn, padding: "0 12px" }}>Ajuster</button>
         </div>
-        <button onClick={exportPDF} className="cyber-button"
-          style={{ borderRadius: 9999, padding: "6px 18px", fontSize: 12, cursor: "pointer" }}>
-          ⬇ PDF Design
-        </button>
-        <button onClick={exportPDFAts} className="cyber-button"
-          style={{ borderRadius: 9999, padding: "6px 18px", fontSize: 12, cursor: "pointer" }}>
-          ⬇ PDF Texte (ATS)
-        </button>
+        <div style={{ position: "relative" }}>
+          <button onClick={exportPDF} className="cyber-button"
+            style={{ borderRadius: 9999, padding: "6px 18px", fontSize: 12, cursor: "pointer" }}>
+            ⬇ Télécharger
+          </button>
+          <button onClick={() => setDlOpen(!dlOpen)} className="cyber-button"
+            style={{ borderRadius: 9999, padding: "6px 10px", fontSize: 12, cursor: "pointer", marginLeft: -1 }}>
+            ▼
+          </button>
+          {dlOpen && (
+            <div style={{
+              position: "absolute", top: "100%", right: 0, marginTop: 6,
+              background: C.bgPanel, border: `1px solid ${C.border}`,
+              borderRadius: 6, zIndex: 10, minWidth: 140,
+            }}>
+              <button onClick={() => { exportPDF(); setDlOpen(false); }} style={{
+                width: "100%", textAlign: "left", padding: "8px 12px",
+                border: "none", background: "transparent", color: C.text,
+                cursor: "pointer", fontSize: 11, ...mono,
+              }}>
+                Design
+              </button>
+              <div style={{ borderTop: `1px solid ${C.border}` }} />
+              <button onClick={() => { exportPDFAts(); setDlOpen(false); }} style={{
+                width: "100%", textAlign: "left", padding: "8px 12px",
+                border: "none", background: "transparent", color: C.body,
+                cursor: "pointer", fontSize: 11, ...mono,
+              }}>
+                Texte (ATS)
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div ref={scrollRef} style={{
