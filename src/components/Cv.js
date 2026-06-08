@@ -128,30 +128,6 @@ const formationFolders = [
 
 const SHEET_W = 794;
 
-function buildAtsLines() {
-  const L = [];
-  L.push(identity.name);
-  L.push(identity.title);
-  contact.forEach(([k, v]) => L.push(`${k} : ${v}`));
-  bioText.forEach((p) => L.push(p));
-  L.push("Stack : " + stack.join(" ; "));
-  L.push("Langues : " + langues.map(([k, v]) => `${k} ${v}`).join(", "));
-  L.push("Objectif : " + objectif);
-  L.push("Projets personnels :");
-  projets.forEach((p) => {
-    L.push(`${p.role} - ${p.company} (${p.date})`);
-    p.lines.forEach((x) => L.push(x));
-  });
-  L.push("Experience professionnelle :");
-  experiencesPro.forEach((p) => {
-    L.push(`${p.role} - ${p.company} (${p.date})`);
-    p.lines.forEach((x) => L.push(x));
-  });
-  L.push("Diplomes :");
-  diplomas.forEach((d) => L.push(`${d.year} - ${d.name} (${d.school})`));
-  return L;
-}
-
 const asciiPdf = (s) => s
   .replace(/→/g, "->")
   .replace(/[–—]/g, "-")
