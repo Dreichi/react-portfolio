@@ -1,284 +1,553 @@
-import { useRef, useCallback } from "react";
+import { useRef, useState, useEffect, useLayoutEffect, useCallback, Fragment } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import portrait from "../assets/cv-portrait.png";
+import qr from "../assets/cv-qr.png";
 
 const C = {
-  gold: "#fdbe04",
-  coral: "#fd5f51",
-  cyan: "#59e8ff",
-  bgDark: "#141414",
-  bgPanel: "#1c1c1f",
-  bgHeader: "#242427",
-  text: "#f0f0f0",
-  textDim: "#a0a0a0",
-  textMuted: "#787878",
-  border: "rgba(255,255,255,0.06)",
+  green:  "#8ae234",
+  blue:   "#729fcf",
+  yellow: "#e9b96e",
+  white:  "#eeeeec",
+  text:   "#cfcfcf",
+  body:   "#9a9a9a",
+  dim:    "#606060",
+  dotY:   "#fdbe04",
+  dotR:   "#fd5f51",
+  bgDark:   "#141414",
+  bgPanel:  "#1c1c1f",
+  bgHeader: "#2a2a2d",
+  bgNano:   "#252528",
+  bgTerm:   "#161618",
+  border:   "rgba(255,255,255,0.08)",
+  folderBlue: "#5b8cc8",
 };
 
-const mono = { fontFamily: "'Fira Code', 'Source Code Pro', 'Courier New', monospace" };
+const mono = { fontFamily: "'Fira Code', 'Source Code Pro', monospace" };
 const sans = { fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" };
+
+function WinDots() {
+  return (
+    <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+      <span style={{ width: 11, height: 11, borderRadius: "50%", background: C.dotY }} />
+      <span style={{ width: 11, height: 11, borderRadius: "50%", background: C.dotR }} />
+    </div>
+  );
+}
+
+function WinBar({ title }) {
+  return (
+    <div style={{
+      display: "flex", alignItems: "center",
+      background: C.bgHeader, padding: "7px 14px",
+      borderBottom: `1px solid ${C.border}`, gap: 8,
+    }}>
+      <span style={{ ...mono, fontSize: 11, color: C.dim }}>🔍</span>
+      <span style={{ flex: 1, textAlign: "center", ...mono, fontSize: 11 }}>{title}</span>
+      <WinDots />
+    </div>
+  );
+}
+
+function Win({ title, children, style, bodyBg }) {
+  return (
+    <div style={{
+      background: bodyBg || C.bgPanel,
+      border: `1px solid ${C.border}`,
+      borderRadius: 8, overflow: "hidden", ...style,
+    }}>
+      <WinBar title={title} />
+      {children}
+    </div>
+  );
+}
+
+function PromptTitle({ topic, host }) {
+  return (
+    <span style={mono}>
+      <span style={{ color: C.green }}>{topic}</span>
+      <span style={{ color: C.green }}>@</span>
+      <span style={{ color: C.green }}>{host}</span>
+      <span style={{ color: C.blue }}>~</span>
+    </span>
+  );
+}
+
+function Prompt({ children }) {
+  return (
+    <>
+      <span style={{ color: C.green }}>louana@portfolio</span>
+      <span style={{ color: C.body }}>:</span>
+      <span style={{ color: C.blue }}>~</span>
+      <span style={{ color: C.body }}>$ </span>
+      {children}
+    </>
+  );
+}
+
+function TerminalPanel({ topic, host, entries, style }) {
+  return (
+    <Win bodyBg={C.bgTerm} style={style} title={<PromptTitle topic={topic} host={host} />}>
+      <div style={{ padding: "13px 15px", ...mono, fontSize: 9, lineHeight: 1.6 }}>
+        {entries.map((exp, i) => (
+          <div key={i} style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 4 }}>
+              <Prompt>
+                <span style={{ color: C.white }}>cat </span>
+                <span style={{ color: C.blue }}>{exp.file}</span>
+              </Prompt>
+            </div>
+            <div style={{ color: C.white, fontWeight: 700, fontSize: 10 }}>{exp.role}</div>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+              <span style={{ color: C.blue, fontWeight: 600 }}>🏢 {exp.company}</span>
+              <span style={{ color: C.green, fontWeight: 600, flexShrink: 0 }}>{exp.date}</span>
+            </div>
+            {exp.lines.map((line, j) => (
+              <div key={j} style={{ color: C.body }}>{line}</div>
+            ))}
+          </div>
+        ))}
+        <div>
+          <Prompt>
+            <span style={{ color: C.green }}>▊</span>
+          </Prompt>
+        </div>
+      </div>
+    </Win>
+  );
+}
+
+function Folder({ years, label }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+      <div style={{ position: "relative", width: 72, height: 56 }}>
+        <div style={{
+          position: "absolute", top: 0, left: 0, width: 26, height: 8,
+          background: C.folderBlue, borderRadius: "3px 3px 0 0", filter: "brightness(0.8)",
+        }} />
+        <div style={{
+          position: "absolute", top: 7, left: 0, right: 0, bottom: 0,
+          background: C.folderBlue, borderRadius: "1px 6px 6px 6px",
+          display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px",
+        }}>
+          <span style={{ ...mono, fontSize: 8.5, color: "#fff", fontWeight: 700, textAlign: "center", whiteSpace: "pre-line", lineHeight: 1.2 }}>
+            {years}
+          </span>
+        </div>
+      </div>
+      {label && (
+        <span style={{ ...mono, fontSize: 7, color: C.body, textAlign: "center", lineHeight: 1.3, maxWidth: 92 }}>
+          {label}
+        </span>
+      )}
+    </div>
+  );
+}
+
+const projets = [
+  {
+    file: "~/projects/erp-rag/README.md",
+    date: "Début 2026",
+    role: "💼 Projet personnel – Data / AI Engineer",
+    company: "ERP Script Finder (RAG local + LLM fine-tuné)",
+    lines: [
+      "🔎 Recherche en langage naturel sur 23 094 scripts ERP (Delphi/WinDev), 100% local",
+      "🧬 Qdrant · recherche hybride BM25 + dense · HyDE · reranking Jina v2",
+      "🎯 Fine-tuning Qwen3.5-35B quantifié (LoRA/QLoRA, Unsloth) · 33k exemples · GPU RunPod",
+      "🚀 API FastAPI en production (systemd) · 89/100 aux tests · ~7 ms/requête",
+    ],
+  },
+  {
+    file: "~/Downloads/DAYREAD/fansub.txt",
+    date: "2021 – 2023",
+    role: "💼 Projet personnel – Équipe de fansub",
+    company: "DAYREAD",
+    lines: [
+      "🗂 Site WordPress hébergeant des épisodes traduits",
+      "💬 Sous-titrage anglais → français (traduction & adaptation)",
+      "🌍 Contenu multilingue, SEO, maintenance technique",
+      "🤝 Coordination d'équipe & publication régulière",
+    ],
+  },
+];
+
+const experiencesPro = [
+  {
+    file: "~/snap/IciLaProd/experience.txt",
+    date: "Octobre 2023 – Avril 2025",
+    role: "💼 Alternance – Développeur DevOps & Fullstack",
+    company: "Ici La Prod SAS",
+    lines: [
+      "🧠 Création d'un CRM sur mesure pour les commerciaux",
+      "🛠 Automatisations via scripts internes pour les équipes",
+      "🗓 Dév. d'Azenda — plateforme de planification de RDV",
+      "🌐 Stack : React, NodeJS, PostgreSQL, Docker",
+    ],
+  },
+  {
+    file: "~/snap/TalesAndKeys/devlog.txt",
+    date: "Mars 2023 – Juin 2023",
+    role: "💼 Stage – Développeur Web",
+    company: "TalesAndKeys",
+    lines: [
+      "🛠 App mobile-first en ReactJS",
+      "🔗 API NodeJS avec MongoDB",
+      "🧩 Toutes les étapes : front/back, tests, intégration",
+    ],
+  },
+];
+
+const SHEET_W = 794;
 
 export default function Cv() {
   const cvRef = useRef(null);
+  const scrollRef = useRef(null);
+  const zoomLayerRef = useRef(null);
+  const [zoom, setZoom] = useState(1);
+  const [navH, setNavH] = useState(64);
+
+  const zoomIn = () => setZoom((z) => Math.min(2, +(z + 0.1).toFixed(2)));
+  const zoomOut = () => setZoom((z) => Math.max(0.4, +(z - 0.1).toFixed(2)));
+  const resetZoom = () => setZoom(1);
+  const fitWidth = useCallback(() => {
+    const cont = scrollRef.current;
+    if (!cont) return;
+    const avail = cont.clientWidth - 48;
+    setZoom(Math.max(0.4, Math.min(1, +(avail / SHEET_W).toFixed(2))));
+  }, []);
+
+  useEffect(() => {
+    const update = () => {
+      const nav = document.querySelector(".fixed.z-50");
+      if (nav) setNavH(Math.round(nav.getBoundingClientRect().height));
+      const cont = scrollRef.current;
+      if (cont && cont.clientWidth < SHEET_W + 48) fitWidth();
+    };
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+    };
+  }, [fitWidth]);
+
+  const zoomRef = useRef(1);
+  zoomRef.current = zoom;
+  const prevZoomRef = useRef(1);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const k = zoom / prevZoomRef.current;
+    if (k !== 1) {
+      el.scrollLeft = (el.scrollLeft + el.clientWidth / 2) * k - el.clientWidth / 2;
+      el.scrollTop = (el.scrollTop + el.clientHeight / 2) * k - el.clientHeight / 2;
+    }
+    prevZoomRef.current = zoom;
+  }, [zoom]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let startDist = 0;
+    let startZoom = 1;
+    const dist = (t) =>
+      Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    const onStart = (e) => {
+      if (e.touches.length === 2) {
+        startDist = dist(e.touches);
+        startZoom = zoomRef.current;
+      }
+    };
+    const onMove = (e) => {
+      if (e.touches.length === 2 && startDist > 0) {
+        e.preventDefault();
+        const ratio = dist(e.touches) / startDist;
+        setZoom(Math.max(0.4, Math.min(2, +(startZoom * ratio).toFixed(2))));
+      }
+    };
+    const onEnd = (e) => {
+      if (e.touches.length < 2) startDist = 0;
+    };
+    el.addEventListener("touchstart", onStart, { passive: false });
+    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchend", onEnd);
+    el.addEventListener("touchcancel", onEnd);
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+      el.removeEventListener("touchcancel", onEnd);
+    };
+  }, []);
 
   const exportPDF = useCallback(async () => {
     if (!cvRef.current) return;
-    const canvas = await html2canvas(cvRef.current, { scale: 2, backgroundColor: C.bgDark, logging: false });
-    const pdfW = 210;
-    const pdfH = (canvas.height * pdfW) / canvas.width;
+    const zl = zoomLayerRef.current;
+    const prevZoom = zl ? zl.style.zoom : "";
+    if (zl) zl.style.zoom = "1";
+    let canvas;
+    try {
+      canvas = await html2canvas(cvRef.current, {
+        scale: 2, backgroundColor: C.bgDark, logging: false, useCORS: true,
+      });
+    } finally {
+      if (zl) zl.style.zoom = prevZoom;
+    }
     const pdf = new jsPDF("p", "mm", "a4");
-    pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pdfW, pdfH);
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = pageW;
+    const imgH = (canvas.height * imgW) / canvas.width;
+    const imgData = canvas.toDataURL("image/png");
+
+    let heightLeft = imgH;
+    let position = 0;
+    pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
+    heightLeft -= pageH;
+    while (heightLeft > 0) {
+      position -= pageH;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
+      heightLeft -= pageH;
+    }
     pdf.save("CV_Louana_Jenger.pdf");
   }, []);
 
-  const SectionTitle = ({ children, align }) => (
-    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, justifyContent: align === "right" ? "flex-end" : "flex-start", flexDirection: align === "right" ? "row-reverse" : "row" }}>
-      <span style={{ width: 16, height: 1, background: C.coral, opacity: 0.5, flexShrink: 0 }} />
-      <span style={{ ...mono, fontSize: 9, color: C.coral, textTransform: "uppercase", letterSpacing: "0.15em" }}>
-        {children}
-      </span>
-    </div>
-  );
+  const zbtn = {
+    borderRadius: 6, minWidth: 30, height: 28, padding: "0 8px",
+    fontSize: 13, cursor: "pointer", display: "inline-flex",
+    alignItems: "center", justifyContent: "center",
+  };
 
   return (
-    <div id="cv" style={{ padding: "64px 16px", background: "#0d0d0f" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-
-        <div style={{ textAlign: "right", marginBottom: 16 }}>
-          <button
-            onClick={exportPDF}
-            className="cyber-button"
-            style={{ borderRadius: 9999, padding: "6px 20px", fontSize: 12, cursor: "pointer" }}
-          >
-            Télécharger PDF
-          </button>
+    <div style={{
+      height: "100dvh", paddingTop: navH, boxSizing: "border-box",
+      background: "#0d0d0f", display: "flex", flexDirection: "column",
+    }}>
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "center",
+        gap: 14, flexWrap: "wrap",
+        padding: "10px 24px", borderBottom: `1px solid ${C.border}`,
+        background: "rgba(13,13,15,0.92)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <button onClick={zoomOut} className="cyber-button" style={zbtn} aria-label="Dézoomer">−</button>
+          <button onClick={resetZoom} className="cyber-button" style={{ ...zbtn, minWidth: 54 }}>{Math.round(zoom * 100)}%</button>
+          <button onClick={zoomIn} className="cyber-button" style={zbtn} aria-label="Zoomer">+</button>
+          <button onClick={fitWidth} className="cyber-button" style={{ ...zbtn, padding: "0 12px" }}>Ajuster</button>
         </div>
+        <button onClick={exportPDF} className="cyber-button"
+          style={{ borderRadius: 9999, padding: "6px 18px", fontSize: 12, cursor: "pointer" }}>
+          ⬇ Télécharger le PDF
+        </button>
+      </div>
 
-        <div
-          ref={cvRef}
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            maxWidth: 794,
-            margin: "0 auto",
-            minHeight: 1123,
-            background: C.bgDark,
-            border: `1px solid ${C.border}`,
-            overflow: "hidden",
-          }}
-        >
-          {/* SIDEBAR */}
-          <div style={{
-            width: "32%",
-            minWidth: 230,
-            background: `linear-gradient(180deg, ${C.bgHeader} 0%, ${C.bgDark} 100%)`,
-            borderRight: `1px solid ${C.border}`,
-            padding: 28,
-            display: "flex",
-            flexDirection: "column",
-            gap: 18,
-            textAlign: "right",
+      <div ref={scrollRef} style={{
+        flex: 1, overflow: "auto", padding: "32px 24px",
+        WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y",
+        overscrollBehavior: "contain",
+      }}>
+        <div ref={zoomLayerRef} style={{ width: SHEET_W, margin: "0 auto", zoom }}>
+          <div ref={cvRef} style={{
+            display: "flex", flexDirection: "column", gap: 8,
+            background: C.bgDark, padding: 8, borderRadius: 12,
           }}>
-            <div>
-              <div style={{ ...mono, fontSize: 10, color: C.gold, marginBottom: 14, letterSpacing: "0.05em" }}>
-                Informations<span style={{ color: C.cyan }}>@LouPC</span>~
-              </div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 2 }}>Louana Jenger</div>
-              <div style={{ fontSize: 10, color: C.gold, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.12em" }}>
-                Développeuse Fullstack &amp; DevOps
-              </div>
-            </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {[
-                ["📍", "Lens, France"],
-                ["✉️", "louana.jenger@gmail.com"],
-                ["📞", "07 81 16 27 23"],
-              ].map(([icon, text]) => (
-                <div key={text} style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6, fontSize: 10, color: C.textDim }}>
-                  <span>{text}</span>
-                  <span style={{ fontSize: 11, color: C.coral, width: 18, textAlign: "center", flexShrink: 0 }}>{icon}</span>
-                </div>
-              ))}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6, fontSize: 10 }}>
-                <a href="https://dreichi.github.io/react-portfolio" target="_blank" rel="noreferrer" style={{ color: C.cyan, textDecoration: "none", fontSize: 9 }}>
-                  Portfolio
-                </a>
-                <span style={{ fontSize: 11, color: C.coral, width: 18, textAlign: "center", flexShrink: 0 }}>🔗</span>
-              </div>
-            </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
 
-            <div>
-              <SectionTitle align="right">🧠 Stack</SectionTitle>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, justifyContent: "flex-end" }}>
-                {["ReactJS","Node.js","TailwindCSS","Docker","AWS","MongoDB","MariaDB","Supabase","Python","TypeScript","Git","Linux"].map(t => (
-                  <span key={t} style={{ ...mono, fontSize: 8, padding: "2px 6px", background: "rgba(255,255,255,0.04)", border: `1px solid ${C.border}`, borderRadius: 2, color: C.textDim }}>{t}</span>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <SectionTitle align="right">🗣️ Langues</SectionTitle>
-              {[
-                ["Français", "Natif"],
-                ["Anglais", "B1 (intermédiaire)"],
-              ].map(([name, level]) => (
-                <div key={name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 10, padding: "3px 0", borderBottom: `1px solid ${C.border}`, flexDirection: "row-reverse" }}>
-                  <span style={{ color: C.textMuted, fontSize: 8 }}>{level}</span>
-                  <span style={{ color: C.text }}>{name}</span>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ fontSize: 10, color: C.textDim, lineHeight: 1.5 }}>
-              🎯 <strong style={{ color: "#fff" }}>Objectif</strong><br />
-              poste <span style={{ color: C.gold }}>Dev/DevOps</span>
-            </div>
-
-            <div style={{ fontSize: 9, color: C.textMuted, lineHeight: 1.5, fontStyle: "italic" }}>
-              🌸 <strong style={{ color: "#fff", fontStyle: "normal" }}>Profil</strong><br />
-              Curieuse, Résiliente, Axée solutions
-            </div>
-
-            <div style={{ flex: 1 }} />
-
-            <div>
-              <SectionTitle align="right">💼 Formation</SectionTitle>
-              <div style={{ fontSize: 9, color: C.textDim, lineHeight: 1.6 }}>
-                {[
-                  ["2026-2025", "EPSI Arras — Licence DevOPS"],
-                  ["2023", "Pop'School — Développeur Web"],
-                  ["2021-2022", "IUT Lens — BUT Informatique"],
-                  ["2018-2020", "BAC STL — Grenoble"],
-                ].map(([yr, txt]) => (
-                  <div key={yr}>
-                    <span style={{ color: C.gold }}>{yr}</span> {txt}
+            <Win style={{ flex: 7 }} title={<PromptTitle topic="Informations" host="LouPC" />}>
+              <div style={{ padding: "14px 18px" }}>
+                <div style={{ display: "flex", gap: 16, marginBottom: 14, alignItems: "flex-start" }}>
+                  <img src={portrait} alt="Louana Jenger"
+                    style={{ width: 90, flexShrink: 0, display: "block", borderRadius: 4 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ ...sans, fontSize: 18, fontWeight: 700, color: C.white, lineHeight: 1.1, marginBottom: 3 }}>
+                      Louana Jenger
+                    </div>
+                    <div style={{ ...mono, fontSize: 9.5, color: C.blue, marginBottom: 10 }}>
+                      Data / AI Engineer · Fullstack &amp; DevOps
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                      {[
+                        ["Localisation", "Lens, France",                      C.text],
+                        ["Email",        "louana.jenger@gmail.com",           C.text],
+                        ["Téléphone",    "07 81 16 27 23",                    C.text],
+                        ["Portfolio",    "dreichi.github.io/react-portfolio", C.blue],
+                      ].map(([lbl, val, col]) => (
+                        <div key={lbl} style={{ ...mono, fontSize: 9, display: "flex", gap: 8 }}>
+                          <span style={{ color: C.yellow, minWidth: 72, flexShrink: 0 }}>{lbl}</span>
+                          <span style={{ color: col }}>{val}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                  <img src={qr} alt="QR"
+                    style={{ width: 54, flexShrink: 0, background: "#fff", padding: 2, borderRadius: 2 }} />
+                </div>
+
+                <div style={{ marginBottom: 8 }}>
+                  <div style={{ ...mono, fontSize: 9.5, color: C.yellow, marginBottom: 4 }}>🧠 Stack</div>
+                  <div style={{ ...mono, fontSize: 9, color: C.body, lineHeight: 1.7 }}>
+                    - Python, FastAPI, SQL (PostgreSQL, MariaDB)<br />
+                    - Qdrant, Ollama, RAG, embeddings, LoRA/QLoRA<br />
+                    - Docker, Linux, Git, systemd, AWS<br />
+                    - React, Node.js, TypeScript (web)
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: 8 }}>
+                  <div style={{ ...mono, fontSize: 9.5, color: C.yellow, marginBottom: 4 }}>🗣 Langues</div>
+                  <div style={{ ...mono, fontSize: 9, color: C.body }}>
+                    Français : <span style={{ color: C.white }}>Natif</span>
+                    {"   "}Anglais : <span style={{ color: C.white }}>B1 (intermédiaire)</span>
+                  </div>
+                </div>
+
+                <div style={{ ...mono, fontSize: 9, display: "flex", gap: 20, flexWrap: "wrap" }}>
+                  <span>
+                    <span style={{ color: C.yellow }}>🎯 Objectif </span>
+                    <span style={{ color: C.white, fontWeight: 600 }}>Alternance Data / AI Engineer</span>
+                  </span>
+                  <span>
+                    <span style={{ color: C.yellow }}>🌸 Profil </span>
+                    <span style={{ color: C.body }}>Curieuse · Résiliente · Axée solutions</span>
+                  </span>
+                </div>
+              </div>
+            </Win>
+
+            <div style={{
+              flex: 3, background: C.bgPanel, border: `1px solid ${C.border}`,
+              borderRadius: 8, overflow: "hidden", display: "flex", flexDirection: "column",
+            }}>
+              <WinBar title={<span style={{ ...mono, fontSize: 11, color: C.text }}>nano</span>} />
+              <div style={{
+                background: C.bgNano, padding: "3px 12px", borderBottom: `1px solid ${C.border}`,
+                display: "flex", justifyContent: "space-between", ...mono, fontSize: 8, color: C.body,
+              }}>
+                <span>GNU nano 8.3</span>
+                <span style={{ color: C.white }}>New Buffer</span>
+                <span>Modified</span>
+              </div>
+              <div style={{ flex: 1, padding: "12px", ...sans, fontSize: 10, color: C.body, lineHeight: 1.75 }}>
+                <p style={{ margin: "0 0 10px 0" }}>
+                  Développeuse orientée <strong style={{ color: C.text }}>Data &amp; IA</strong>,
+                  passionnée par la création de solutions concrètes à des problèmes complexes.
+                  J'aime concevoir des <strong style={{ color: C.text }}>pipelines de données
+                  fiables et mesurables</strong> — de l'ingestion à la mise en production de modèles.
+                </p>
+                <p style={{ margin: 0 }}>
+                  Je recherche une <strong style={{ color: C.text }}>alternance de Data / AI
+                  Engineer</strong> dans un environnement stimulant, où je peux apprendre vite
+                  tout en apportant de la valeur rapidement. Curieuse, autonome et investie.
+                </p>
+              </div>
+              <div style={{ background: C.bgNano, borderTop: `1px solid ${C.border}`, display: "flex", flexWrap: "wrap", padding: "2px 4px" }}>
+                {[["^G","Help"],["^X","Exit"],["^O","Write Out"],["^R","Read Fil"],["^W","Where Is"],["^K","Cut"],["^U","Paste"]].map(([k, l]) => (
+                  <span key={k} style={{ ...mono, fontSize: 7, padding: "2px 4px", color: C.body }}>
+                    <span style={{ background: C.body, color: "#111", padding: "0 2px" }}>{k}</span> {l}
+                  </span>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* MAIN */}
-          <div style={{ flex: 1, padding: 28, display: "flex", flexDirection: "column", gap: 16, ...sans }}>
-            {/* Header divider */}
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ flex: 1, height: 1, background: C.border }} />
-              <span style={{ ...mono, fontSize: 11, whiteSpace: "nowrap" }}>
-                <span style={{ color: C.cyan }}>Projets</span>
-                <span style={{ color: C.coral }}>@</span>
-                <span style={{ color: C.text }}>Expérience</span>
-                <span style={{ color: C.coral }}>~</span>
-              </span>
-              <span style={{ flex: 1, height: 1, background: C.border }} />
-            </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+            <TerminalPanel topic="Projets" host="perso" entries={projets} style={{ flex: 1 }} />
+            <TerminalPanel topic="Expérience" host="pro" entries={experiencesPro} style={{ flex: 1 }} />
+          </div>
 
-            <p style={{ fontSize: 10.5, color: C.textDim, lineHeight: 1.65, margin: 0 }}>
-              <strong style={{ color: C.text }}>Développeuse spécialisée en DevOps,</strong> je suis passionnée par la création de solutions concrètes à des problèmes complexes. J'aime comprendre comment les systèmes interagissent pour pouvoir <strong style={{ color: C.text }}>automatiser, fiabiliser et fluidifier</strong> les processus de développement.
-            </p>
-            <p style={{ fontSize: 10, color: C.textDim, lineHeight: 1.65, margin: 0 }}>
-              En constante montée en compétences, je recherche aujourd'hui une <strong style={{ color: C.text }}>alternance</strong> dans un environnement stimulant tout en restant ouverte à des opportunités professionnelles dans le monde du <strong style={{ color: C.text }}>développement ou de la cybersécurité.</strong> Curieuse, autonome et investie, j'apprécie particulièrement les projets où je peux apprendre tout en apportant de la valeur rapidement.
-            </p>
+          <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
 
-            {[
-              {
-                cmd: "cat ~/snap/IciLaProd/experience.txt",
-                date: "Octobre 2023 – Avril 2025",
-                title: "🏢 Alternance – Développeur DevOps & Fullstack",
-                company: "Ici La Prod SAS",
-                desc: "Création d'un CRM sur mesure pour les commerciaux. Automatisations via scripts internes pour faciliter le quotidien des équipes. Participation active au développement d'Azenda (plateforme de planification de RDV).",
-                tags: ["React", "NodeJS", "PostgreSQL", "Docker"],
-              },
-              {
-                cmd: "cat ~/snap/TalesAndKeys/devlog.txt",
-                date: "Mars 2023 – Juin 2023",
-                title: "🛠️ Stage – Développeur Web",
-                company: "TalesAndKeys",
-                desc: "App mobile-first en ReactJS. API NodeJS avec MongoDB. Participation à toutes les étapes : dev front/back, tests, intégration.",
-                tags: ["ReactJS", "NodeJS", "MongoDB"],
-              },
-              {
-                cmd: "cat ~/Downloads/DAYREAD/fansub.txt",
-                date: "2021 – 2023",
-                title: "🌍 Projet personnel – Équipe de fansub",
-                company: "DAYREAD",
-                desc: "Création et gestion d'un site WordPress pour héberger des épisodes traduits. Gestion de contenu multilingue, SEO, maintenance technique. Coordination d'équipe & publication régulière.",
-                tags: ["WordPress", "SEO", "Gestion d'équipe"],
-              },
-            ].map((exp) => (
-              <div key={exp.cmd} style={{ position: "relative", paddingLeft: 14, borderLeft: `1px solid rgba(255,255,255,0.08)`, marginBottom: 2 }}>
-                <div style={{ position: "absolute", left: -3, top: 4, width: 5, height: 5, borderRadius: "50%", background: C.gold }} />
-                <div style={{ ...mono, fontSize: 9, color: C.cyan, marginBottom: 1 }}>
-                  <span style={{ color: C.gold }}>$</span> {exp.cmd}
+            <Win style={{ width: "36%", flexShrink: 0 }} title={<span style={{ ...mono, fontSize: 11, color: C.text }}>Diplômes</span>}>
+              <div style={{ padding: "12px 14px", ...mono, fontSize: 9 }}>
+                <div style={{ marginBottom: 5 }}>
+                  <span style={{ color: C.green }}>louana@portfolio</span>
+                  <span style={{ color: C.body }}>:</span>
+                  <span style={{ color: C.blue }}>~</span>
+                  <span style={{ color: C.body }}>$ </span>
+                  <span style={{ color: C.white }}>ls -l </span>
+                  <span style={{ color: C.blue }}>~/.diplomas/</span>
                 </div>
-                <div style={{ fontSize: 9.5, color: C.coral, fontWeight: 500, marginBottom: 1 }}>{exp.date}</div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: C.text }}>{exp.title}</div>
-                <div style={{ fontSize: 10, color: C.gold, fontWeight: 500, marginBottom: 4 }}>{exp.company}</div>
-                <div style={{ fontSize: 9, color: C.textDim, lineHeight: 1.55 }}>{exp.desc}</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginTop: 5 }}>
-                  {exp.tags.map(t => (
-                    <span key={t} style={{ ...mono, fontSize: 7.5, padding: "1px 5px", background: "rgba(253,190,4,0.08)", border: "1px solid rgba(253,190,4,0.15)", borderRadius: 2, color: C.gold }}>{t}</span>
+                <div style={{ color: C.dim, marginBottom: 8 }}>total 3</div>
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "max-content max-content 1fr",
+                  columnGap: 10, rowGap: 10, alignItems: "start",
+                }}>
+                  {[
+                    { perms: "-rw-r--r--", year: "2024", icon: "📘", name: "Licence Concepteur & Dév. d'Applications", school: "EPSI Arras" },
+                    { perms: "-rw-r--r--", year: "2023", icon: "💻", name: "Certification Développeur Web",             school: "Pop'School" },
+                    { perms: "-rw-r--r--", year: "2020", icon: "🔬", name: "BAC Sciences et Techniques de Labo.",       school: "Grenoble" },
+                  ].map((d) => (
+                    <Fragment key={d.year}>
+                      <span style={{ color: C.dim }}>{d.perms}</span>
+                      <span style={{ color: C.text }}>{d.year}</span>
+                      <span style={{ lineHeight: 1.4 }}>
+                        <span style={{ color: C.white }}>{d.icon} {d.name}</span>
+                        <span style={{ color: C.dim }}> · {d.school}</span>
+                      </span>
+                    </Fragment>
                   ))}
                 </div>
               </div>
-            ))}
+            </Win>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-              <span style={{ fontSize: 15 }}>📘</span>
-              <span style={{ ...mono, fontSize: 11, color: C.gold }}>Diplômes</span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 20px" }}>
-              {[
-                ["2024", "Licence Concepteur & Développeur d'Applications", "EPSI"],
-                ["2023", "Certification Développeur Web", "Pop'School"],
-                ["2020", "BAC Sciences et Techniques de Laboratoires", "Grenoble"],
-              ].map(([year, name, school]) => (
-                <div key={year} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                  <span style={{ ...mono, fontSize: 10.5, fontWeight: 600, color: C.gold, whiteSpace: "nowrap", minWidth: 34 }}>{year}</span>
-                  <div>
-                    <div style={{ fontSize: 9.5, color: C.text, fontWeight: 500 }}>{name}</div>
-                    <div style={{ fontSize: 8.5, color: C.textMuted }}>{school}</div>
+            <div style={{ flex: 1, background: C.bgPanel, border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden" }}>
+              <div style={{
+                display: "flex", alignItems: "center", background: C.bgHeader,
+                borderBottom: `1px solid ${C.border}`, padding: "6px 14px", gap: 10,
+              }}>
+                <span style={{ ...mono, fontSize: 11, color: C.white, fontWeight: 600 }}>Files</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
+                  <span style={{ color: C.dim, fontSize: 13 }}>‹</span>
+                  <span style={{ color: C.dim, fontSize: 13 }}>›</span>
+                  <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 4, padding: "2px 8px" }}>
+                    <span style={{ ...mono, fontSize: 9.5, color: C.body }}>📁 Formation</span>
                   </div>
                 </div>
-              ))}
-            </div>
-
-            <div style={{ marginTop: 4 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                <span style={{ fontSize: 15 }}>💼</span>
-                <span style={{ ...mono, fontSize: 11, color: C.gold }}>Formation</span>
-                <span style={{ flex: 1, height: 1, background: C.border }} />
+                <WinDots />
               </div>
-              <div style={{ position: "relative", paddingTop: 8 }}>
-                <div style={{ position: "absolute", left: 0, right: 0, top: "50%", height: 1, background: C.border, transform: "translateY(-50%)" }} />
-                <div style={{ display: "flex", justifyContent: "space-between", position: "relative", gap: 6 }}>
+
+              <div style={{ display: "flex" }}>
+                <div style={{ width: 96, borderRight: `1px solid ${C.border}`, padding: "8px 0", flexShrink: 0 }}>
                   {[
-                    { years: "2026 → 2025", title: "EPSI Arras", sub: "Licence DevOPS", active: true },
-                    { years: "2023 → 2023", title: "Pop'School", sub: "Développeur Web/Web mobile" },
-                    { years: "2021 → 2022", title: "IUT Lens", sub: "BUT informatique" },
-                    { years: "2018 → 2020", title: "BAC STL", sub: "Sciences et Techniques de Laboratoires" },
-                  ].map((entry) => (
-                    <div key={entry.title} style={{ textAlign: "center", flex: 1, paddingTop: 18, position: "relative", minWidth: 0 }}>
-                      <div style={{
-                        position: "absolute",
-                        top: "calc(50% + 9px)",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: 5,
-                        height: 5,
-                        borderRadius: "50%",
-                        zIndex: 1,
-                        background: entry.active ? C.cyan : C.gold,
-                        boxShadow: entry.active ? `0 0 6px ${C.cyan}66` : "none",
-                      }} />
-                      <div style={{ ...mono, fontSize: 7.5, color: C.coral, marginBottom: 4, letterSpacing: "0.04em" }}>{entry.years}</div>
-                      <div style={{ fontSize: 8.5, fontWeight: 600, color: entry.active ? C.cyan : C.text, lineHeight: 1.25, marginBottom: 1 }}>{entry.title}</div>
-                      <div style={{ fontSize: 7, color: C.textMuted, lineHeight: 1.25 }}>{entry.sub}</div>
+                    ["📁 Formation", true],
+                    ["🕘 Recent",    false],
+                    ["⭐ Starred",   false],
+                    ["🗑 Trash",     false],
+                    ["📄 Documents", false],
+                    ["🖼 Pictures",  false],
+                  ].map(([item, active]) => (
+                    <div key={item} style={{
+                      ...mono, fontSize: 8.5, padding: "5px 10px",
+                      color: active ? C.white : C.dim,
+                      background: active ? "rgba(114,159,207,0.16)" : "transparent",
+                      borderLeft: active ? `2px solid ${C.blue}` : "2px solid transparent",
+                    }}>
+                      {item}
                     </div>
                   ))}
                 </div>
+
+                <div style={{
+                  flex: 1, padding: "16px 18px",
+                  display: "flex", flexWrap: "wrap", gap: "16px 22px", alignItems: "flex-start",
+                }}>
+                  {[
+                    { years: "2026...", label: "" },
+                    { years: "2023\n-\n2025", label: "EPSI Arras - Licence DevOPS" },
+                    { years: "2022\n-\n2023", label: "Popschool - Dév. Web/mobile" },
+                    { years: "2021\n-\n2022", label: "IUT Lens - BUT informatique" },
+                    { years: "2018\n-\n2020", label: "BAC STL - Sciences Labo." },
+                  ].map((f) => <Folder key={f.years} years={f.years} label={f.label} />)}
+                </div>
               </div>
             </div>
+          </div>
+
           </div>
         </div>
       </div>
