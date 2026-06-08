@@ -567,8 +567,8 @@ export default function Cv() {
             }}>
               <WinBar title={<span style={{ ...mono, fontSize: 11, color: C.text }}>nano</span>} />
               <div style={{
-                background: C.bgNano, padding: "3px 12px", borderBottom: `1px solid ${C.border}`,
-                display: "flex", justifyContent: "space-between", ...mono, fontSize: 8, color: C.body,
+                background: C.bgNano, padding: "4px 12px", borderBottom: `1px solid ${C.border}`,
+                display: "flex", justifyContent: "space-between", alignItems: "center", lineHeight: 1, ...mono, fontSize: 8, color: C.body,
               }}>
                 <span>GNU nano 8.3</span>
                 <span style={{ color: C.white }}>New Buffer</span>
@@ -643,8 +643,8 @@ export default function Cv() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
                   <span style={{ color: C.dim, fontSize: 13 }}>‹</span>
                   <span style={{ color: C.dim, fontSize: 13 }}>›</span>
-                  <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 4, padding: "2px 8px" }}>
-                    <span style={{ ...mono, fontSize: 9.5, color: C.body }}>📁 Formation</span>
+                  <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 4, padding: "3px 8px", display: "flex", alignItems: "center" }}>
+                    <span style={{ ...mono, fontSize: 9.5, color: C.body, lineHeight: 1 }}>📁 Formation</span>
                   </div>
                 </div>
                 <WinDots />
