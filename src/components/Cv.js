@@ -375,6 +375,7 @@ export default function Cv() {
                         ["Email",        "louana.jenger@gmail.com",           C.text],
                         ["Téléphone",    "07 81 16 27 23",                    C.text],
                         ["Portfolio",    "dreichi.github.io/react-portfolio", C.blue],
+                        ["Permis",       "B (en cours)",                      C.text],
                       ].map(([lbl, val, col]) => (
                         <div key={lbl} style={{ ...mono, fontSize: 9, display: "flex", gap: 8 }}>
                           <span style={{ color: C.yellow, minWidth: 72, flexShrink: 0 }}>{lbl}</span>
@@ -434,14 +435,14 @@ export default function Cv() {
               <div style={{ flex: 1, padding: "12px", ...sans, fontSize: 10, color: C.body, lineHeight: 1.75 }}>
                 <p style={{ margin: "0 0 10px 0" }}>
                   Développeuse orientée <strong style={{ color: C.text }}>Data &amp; IA</strong>,
-                  passionnée par la création de solutions concrètes à des problèmes complexes.
-                  J'aime concevoir des <strong style={{ color: C.text }}>pipelines de données
-                  fiables et mesurables</strong> — de l'ingestion à la mise en production de modèles.
+                  j'aime résoudre des problèmes complexes en prenant le temps d'en considérer
+                  les différents aspects — technique, métier et usage. Je cherche à construire
+                  des choses fiables, qui ont du sens et une utilité concrète.
                 </p>
                 <p style={{ margin: 0 }}>
                   Je recherche une <strong style={{ color: C.text }}>alternance de Data / AI
                   Engineer</strong> dans un environnement stimulant, où je peux apprendre vite
-                  tout en apportant de la valeur rapidement. Curieuse, autonome et investie.
+                  tout en apportant de la valeur. Curieuse, rigoureuse et à l'écoute.
                 </p>
               </div>
               <div style={{ background: C.bgNano, borderTop: `1px solid ${C.border}`, display: "flex", flexWrap: "wrap", padding: "2px 4px" }}>
