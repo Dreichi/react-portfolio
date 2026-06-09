@@ -135,6 +135,37 @@ const asciiPdf = (s) => s
   .replace(/\s+/g, " ")
   .trim();
 
+const buildAtsLines = () => {
+  const out = [];
+  out.push(identity.name);
+  out.push(identity.title);
+  out.push("");
+  contact.forEach(([k, v]) => out.push(`${k}: ${v}`));
+  out.push("");
+  out.push("Profil");
+  bioText.forEach((p) => out.push(p));
+  out.push("");
+  out.push("Competences");
+  out.push("Stack: " + stack.join(", "));
+  out.push("Langues: " + langues.map(([k, v]) => `${k} (${v})`).join(", "));
+  out.push("");
+  out.push("Projets Personnels");
+  projets.forEach((p) => {
+    out.push(`${p.role} - ${p.company} (${p.date})`);
+    p.lines.forEach((ln) => out.push(ln));
+    out.push("");
+  });
+  out.push("Experience Professionnelle");
+  experiencesPro.forEach((p) => {
+    out.push(`${p.role} - ${p.company} (${p.date})`);
+    p.lines.forEach((ln) => out.push(ln));
+    out.push("");
+  });
+  out.push("Diplomes");
+  diplomas.forEach((d) => out.push(`${d.year} - ${d.name} (${d.school})`));
+  return out;
+};
+
 function WinDots() {
   return (
     <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
@@ -263,8 +294,6 @@ export default function Cv() {
   const zoomLayerRef = useRef(null);
   const [zoom, setZoom] = useState(1);
   const [navH, setNavH] = useState(64);
-  const [dlOpen, setDlOpen] = useState(false);
-
   const zoomIn = () => setZoom((z) => Math.min(2, +(z + 0.1).toFixed(2)));
   const zoomOut = () => setZoom((z) => Math.max(0.4, +(z - 0.1).toFixed(2)));
   const resetZoom = () => setZoom(1);
@@ -367,85 +396,26 @@ export default function Cv() {
     }
 
     pdf.addImage(img, "JPEG", 0, 0, pageW, pageH);
+
+    const tm = 8;
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    const wrapped = [];
+    buildAtsLines().forEach((ln) => {
+      const s = asciiPdf(ln || "");
+      if (!s) { wrapped.push(""); return; }
+      pdf.splitTextToSize(s, pageW - tm * 2).forEach((w) => wrapped.push(w));
+    });
+    const lh = Math.min(3.2, (pageH - tm * 2) / Math.max(wrapped.length, 1));
+    let ty = tm + lh;
+    wrapped.forEach((ln) => {
+      if (ln) pdf.text(ln, tm, ty, { renderingMode: "invisible" });
+      ty += lh;
+    });
+
     pdf.save("CV_Louana_Jenger.pdf");
   }, []);
 
-  const exportPDFAts = useCallback(() => {
-    const pdf = new jsPDF("p", "mm", "a4");
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(11);
-    pdf.setTextColor(0, 0, 0);
-
-    let y = 15;
-    const lineH = 5.5;
-    const pageH = pdf.internal.pageSize.getHeight();
-    const pageW = pdf.internal.pageSize.getWidth();
-    const margin = 15;
-    const maxW = pageW - margin * 2;
-
-    const addLine = (text) => {
-      if (y > pageH - 15) {
-        pdf.addPage();
-        y = 15;
-      }
-      if (text.trim()) {
-        pdf.text(asciiPdf(text), margin, y, { maxWidth: maxW });
-        y += lineH;
-      } else {
-        y += 2;
-      }
-    };
-
-    addLine(identity.name);
-    pdf.setFontSize(10);
-    addLine(identity.title);
-    pdf.setFontSize(11);
-    addLine("");
-
-    contact.forEach(([k, v]) => addLine(`${k}: ${v}`));
-    addLine("");
-
-    pdf.setFontSize(10);
-    pdf.setFont("helvetica", "bold");
-    addLine("Profil");
-    pdf.setFont("helvetica", "normal");
-    bioText.forEach((p) => addLine(asciiPdf(p)));
-    addLine("");
-
-    pdf.setFont("helvetica", "bold");
-    addLine("Compétences");
-    pdf.setFont("helvetica", "normal");
-    addLine("Stack: " + stack.join(" · "));
-    addLine("Langues: " + langues.map(([k, v]) => `${k} (${v})`).join(" · "));
-    addLine("");
-
-    pdf.setFont("helvetica", "bold");
-    addLine("Projets Personnels");
-    pdf.setFont("helvetica", "normal");
-    projets.forEach((p) => {
-      addLine(`${p.role} – ${p.company} (${p.date})`);
-      p.lines.forEach((ln) => addLine(asciiPdf(ln)));
-      addLine("");
-    });
-
-    pdf.setFont("helvetica", "bold");
-    addLine("Expérience Professionnelle");
-    pdf.setFont("helvetica", "normal");
-    experiencesPro.forEach((p) => {
-      addLine(`${p.role} – ${p.company} (${p.date})`);
-      p.lines.forEach((ln) => addLine(asciiPdf(ln)));
-      addLine("");
-    });
-
-    pdf.setFont("helvetica", "bold");
-    addLine("Diplômes");
-    pdf.setFont("helvetica", "normal");
-    diplomas.forEach((d) => {
-      addLine(`${d.year} – ${d.name} (${d.school})`);
-    });
-
-    pdf.save("CV_Louana_Jenger_ATS.pdf");
-  }, []);
 
   const zbtn = {
     borderRadius: 6, minWidth: 30, height: 28, padding: "0 8px",
@@ -470,31 +440,10 @@ export default function Cv() {
           <button onClick={zoomIn} className="cyber-button" style={zbtn} aria-label="Zoomer">+</button>
           <button onClick={fitWidth} className="cyber-button" style={{ ...zbtn, padding: "0 12px" }}>Ajuster</button>
         </div>
-        <div style={{ position: "relative", display: "inline-flex" }}>
-          <button onClick={exportPDF} className="cyber-button"
-            style={{ ...zbtn, borderRadius: "6px 0 0 6px", padding: "0 14px" }}>
-            ⬇ Télécharger
-          </button>
-          <button onClick={() => setDlOpen(!dlOpen)} className="cyber-button" aria-label="Autres formats"
-            style={{ ...zbtn, borderRadius: "0 6px 6px 0", minWidth: 24, padding: "0 7px", marginLeft: -1, fontSize: 9 }}>
-            ▼
-          </button>
-          {dlOpen && (
-            <div style={{
-              position: "absolute", top: "100%", right: 0, marginTop: 6,
-              background: C.bgPanel, border: `1px solid ${C.border}`,
-              borderRadius: 6, zIndex: 10, minWidth: 150, overflow: "hidden",
-            }}>
-              <button onClick={() => { exportPDFAts(); setDlOpen(false); }} style={{
-                width: "100%", textAlign: "left", padding: "9px 12px",
-                border: "none", background: "transparent", color: C.text,
-                cursor: "pointer", fontSize: 11, ...mono,
-              }}>
-                ⬇ Version texte (ATS)
-              </button>
-            </div>
-          )}
-        </div>
+        <button onClick={exportPDF} className="cyber-button"
+          style={{ ...zbtn, padding: "0 14px" }}>
+          ⬇ Télécharger
+        </button>
       </div>
 
       <div ref={scrollRef} style={{
