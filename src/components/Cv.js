@@ -358,7 +358,15 @@ export default function Cv() {
     const pageW = 210;
     const pageH = +(pageW * canvas.height / canvas.width).toFixed(1);
     const pdf = new jsPDF({ orientation: "p", unit: "mm", format: [pageW, pageH] });
-    pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pageW, pageH);
+
+    const targetBytes = 2.7 * 1024 * 1024;
+    let img = canvas.toDataURL("image/jpeg", 0.95);
+    for (const q of [0.9, 0.86, 0.82, 0.78, 0.72]) {
+      if ((img.length * 3) / 4 <= targetBytes) break;
+      img = canvas.toDataURL("image/jpeg", q);
+    }
+
+    pdf.addImage(img, "JPEG", 0, 0, pageW, pageH);
     pdf.save("CV_Louana_Jenger.pdf");
   }, []);
 
